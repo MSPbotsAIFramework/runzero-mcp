@@ -1,0 +1,164 @@
+[
+  {
+    "id": "TC-RZ-001",
+    "ac": "AC1",
+    "text": "Given a valid X-Runzero-Api-Token, When runzero_list_assets is called with no filters, Then it returns a bounded asset list with total/has_more, each asset carrying id/names/addresses/os/risk fields",
+    "type": "auto",
+    "tests": [
+      "tests/test_tools.py::test_list_assets_returns_bounded_list_with_fields"
+    ],
+    "result": "pass",
+    "evidence": "tests/test_tools.py::test_list_assets_returns_bounded_list_with_fields PASSED. uv run pytest -q @ 575a969 -> 23 passed in 1.07s (tests/test_tools.py, tests/test_middleware.py)"
+  },
+  {
+    "id": "TC-RZ-002",
+    "ac": "AC1",
+    "text": "Given a valid token, When runzero_list_assets is called with a search filter, Then only assets matching that filter are returned (verified against a mocked RunZero response containing both matching and non-matching records)",
+    "type": "auto",
+    "tests": [
+      "tests/test_tools.py::test_list_assets_search_filter_excludes_non_matching"
+    ],
+    "result": "pass",
+    "evidence": "tests/test_tools.py::test_list_assets_search_filter_excludes_non_matching PASSED. uv run pytest -q @ 575a969 -> 23 passed in 1.07s (tests/test_tools.py, tests/test_middleware.py)"
+  },
+  {
+    "id": "TC-RZ-003",
+    "ac": "AC2",
+    "text": "Given a valid token, When runzero_list_sites is called, Then it returns the organization's sites with id and name",
+    "type": "auto",
+    "tests": [
+      "tests/test_tools.py::test_list_sites_returns_id_and_name"
+    ],
+    "result": "pass",
+    "evidence": "tests/test_tools.py::test_list_sites_returns_id_and_name PASSED. uv run pytest -q @ 575a969 -> 23 passed in 1.07s (tests/test_tools.py, tests/test_middleware.py)"
+  },
+  {
+    "id": "TC-RZ-004",
+    "ac": "AC3",
+    "text": "Given a valid token and a site_id, When runzero_start_scan is called, Then it starts a scan and returns a scan_id and status, with readOnlyHint=false and idempotentHint=false declared on the tool",
+    "type": "auto",
+    "tests": [
+      "tests/test_tools.py::test_start_scan_returns_scan_id_and_status",
+      "tests/test_tools.py::test_start_scan_hints_are_non_readonly_non_idempotent"
+    ],
+    "result": "pass",
+    "evidence": "tests/test_tools.py::test_start_scan_returns_scan_id_and_status, tests/test_tools.py::test_start_scan_hints_are_non_readonly_non_idempotent PASSED. uv run pytest -q @ 575a969 -> 23 passed in 1.07s (tests/test_tools.py, tests/test_middleware.py)"
+  },
+  {
+    "id": "TC-RZ-005",
+    "ac": "AC3",
+    "text": "Given a valid token, When runzero_start_scan is called without a site_id, Then it is rejected with error code invalid_argument and no scan is started (no implicit \"scan everything\")",
+    "type": "auto",
+    "tests": [
+      "tests/test_tools.py::test_start_scan_without_site_id_is_rejected"
+    ],
+    "result": "pass",
+    "evidence": "tests/test_tools.py::test_start_scan_without_site_id_is_rejected PASSED. uv run pytest -q @ 575a969 -> 23 passed in 1.07s (tests/test_tools.py, tests/test_middleware.py)"
+  },
+  {
+    "id": "TC-RZ-006",
+    "ac": "AC4",
+    "text": "Given a valid token, When runzero_list_scans is called, Then it returns recent scan tasks each with a status field (queued/running/complete/failed) that a caller can poll",
+    "type": "auto",
+    "tests": [
+      "tests/test_tools.py::test_list_scans_returns_status_field"
+    ],
+    "result": "pass",
+    "evidence": "tests/test_tools.py::test_list_scans_returns_status_field PASSED. uv run pytest -q @ 575a969 -> 23 passed in 1.07s (tests/test_tools.py, tests/test_middleware.py)"
+  },
+  {
+    "id": "TC-RZ-007",
+    "ac": "AC5",
+    "text": "Given a valid token, When runzero_list_vulnerabilities is called with no filters, Then it returns vulnerability records each with id/cve/severity/asset_id",
+    "type": "auto",
+    "tests": [
+      "tests/test_tools.py::test_list_vulnerabilities_returns_expected_fields"
+    ],
+    "result": "pass",
+    "evidence": "tests/test_tools.py::test_list_vulnerabilities_returns_expected_fields PASSED. uv run pytest -q @ 575a969 -> 23 passed in 1.07s (tests/test_tools.py, tests/test_middleware.py)"
+  },
+  {
+    "id": "TC-RZ-008",
+    "ac": "AC5",
+    "text": "Given a valid token, When runzero_list_vulnerabilities is called scoped to one asset_id, Then only that asset's vulnerabilities are returned",
+    "type": "auto",
+    "tests": [
+      "tests/test_tools.py::test_list_vulnerabilities_scoped_to_asset"
+    ],
+    "result": "pass",
+    "evidence": "tests/test_tools.py::test_list_vulnerabilities_scoped_to_asset PASSED. uv run pytest -q @ 575a969 -> 23 passed in 1.07s (tests/test_tools.py, tests/test_middleware.py)"
+  },
+  {
+    "id": "TC-RZ-009",
+    "ac": "AC6",
+    "text": "Given no X-Runzero-Api-Token Header is sent, When any tool is called, Then the service returns 401 with the required Header name listed in the body, not a 500",
+    "type": "auto",
+    "tests": [
+      "tests/test_middleware.py::test_missing_credential_header_returns_401_with_header_name"
+    ],
+    "result": "pass",
+    "evidence": "tests/test_middleware.py::test_missing_credential_header_returns_401_with_header_name PASSED. uv run pytest -q @ 575a969 -> 23 passed in 1.07s (tests/test_tools.py, tests/test_middleware.py)"
+  },
+  {
+    "id": "TC-RZ-010",
+    "ac": "AC7",
+    "text": "Given RunZero returns 429, When a tool calls it, Then the tool surfaces {\"error\": {\"code\": \"rate_limited\", \"retryable\": true, ...}} instead of an unhandled exception",
+    "type": "auto",
+    "tests": [
+      "tests/test_tools.py::test_runzero_429_maps_to_rate_limited_retryable"
+    ],
+    "result": "pass",
+    "evidence": "tests/test_tools.py::test_runzero_429_maps_to_rate_limited_retryable PASSED. uv run pytest -q @ 575a969 -> 23 passed in 1.07s (tests/test_tools.py, tests/test_middleware.py)"
+  },
+  {
+    "id": "TC-RZ-011",
+    "ac": "AC7",
+    "text": "Given RunZero returns 401 (expired/invalid token), When a tool calls it, Then the tool surfaces {\"error\": {\"code\": \"unauthorized\", \"retryable\": false, ...}}",
+    "type": "auto",
+    "tests": [
+      "tests/test_tools.py::test_runzero_401_maps_to_unauthorized_non_retryable"
+    ],
+    "result": "pass",
+    "evidence": "tests/test_tools.py::test_runzero_401_maps_to_unauthorized_non_retryable PASSED. uv run pytest -q @ 575a969 -> 23 passed in 1.07s (tests/test_tools.py, tests/test_middleware.py)"
+  },
+  {
+    "id": "TC-RZ-012",
+    "ac": "AC8",
+    "text": "Given two sequential requests use two different tokens (simulating two tenants), When each request completes, Then the per-request ContextVar is reset and neither request's token is observable from the other's handler",
+    "type": "auto",
+    "tests": [
+      "tests/test_middleware.py::test_context_var_isolated_and_reset_between_requests"
+    ],
+    "result": "pass",
+    "evidence": "tests/test_middleware.py::test_context_var_isolated_and_reset_between_requests PASSED. uv run pytest -q @ 575a969 -> 23 passed in 1.07s (tests/test_tools.py, tests/test_middleware.py)"
+  },
+  {
+    "id": "TC-RZ-013",
+    "ac": "AC1",
+    "text": "Given a real RunZero account and token, When runzero_list_assets and runzero_list_vulnerabilities are called, Then the returned data matches what the RunZero console shows for the same organization",
+    "type": "manual",
+    "steps": [
+      "Obtain a real RunZero Export or Organization token for a test org",
+      "Set it as X-Runzero-Api-Token and call runzero_list_assets with no filters",
+      "Call runzero_list_vulnerabilities with no filters",
+      "Open the RunZero console for the same org and compare asset count and a sample of vulnerability records"
+    ],
+    "expect": "Asset count and a sample of vulnerability records returned by the tools match the RunZero console for the same org",
+    "result": "untested",
+    "evidence": "needs a real RunZero account; not available at design time. Not a blocker per the completion criteria (no test account is not a blocker)."
+  },
+  {
+    "id": "TC-RZ-014",
+    "ac": "AC3",
+    "text": "Given a real RunZero account, a disposable test org, and a site_id, When runzero_start_scan is called, Then a scan actually starts and becomes visible in the RunZero console",
+    "type": "manual",
+    "steps": [
+      "Obtain a real RunZero Organization token scoped to a disposable test org (never run against a production org)",
+      "Call runzero_start_scan with that org's site_id",
+      "Open the RunZero console for the test org and confirm a new scan appears with a matching scan_id"
+    ],
+    "expect": "A new scan appears in the RunZero console for the test org, with a scan_id matching the tool's response",
+    "result": "untested",
+    "evidence": "needs a real RunZero account and a disposable test org; not available at design time. Not a blocker. Must not be run against a production RunZero org."
+  }
+]
